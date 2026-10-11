@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tezgah Sandwich - Sipariş Ver</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: #F9F9F6; color: #2C2C2C; margin: 0; padding: 20px 20px 100px 20px; }
+        
+        .container { max-width: 600px; margin: 0 auto; background: #FFFFFF; padding: 30px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 2.2rem; letter-spacing: 4px; margin: 0 0 5px 0; color: #2C2C2C; text-transform: uppercase; font-weight: 300; }
+        .header p { letter-spacing: 2px; color: #7A7A7A; margin: 0; font-size: 0.9rem; }
+        
+        .section-title { font-size: 1.2rem; font-weight: 600; color: #2C2C2C; border-left: 3px solid #B5533A; padding-left: 10px; margin: 30px 0 15px 0; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #EAEAEA; border-radius: 6px; font-size: 1rem; outline: none; }
+        .form-control:focus { border-color: #B5533A; }
+        
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #F0F0F0; }
+        .item-row:last-child { border-bottom: none; }
+        
+        .checkbox-label, .radio-label { display: flex; align-items: center; cursor: pointer; font-size: 0.95rem; width: 100%; }
+        .checkbox-label input, .radio-label input { margin-right: 12px; transform: scale(1.2); accent-color: #B5533A; cursor: pointer; }
+        
+        .price-tag { font-weight: 600; color: #B5533A; font-size: 0.95rem; }
+        .extra-badge { background-color: #F8EDEA; color: #B5533A; font-size: 0.75rem; padding: 3px 6px; border-radius: 4px; margin-left: 8px; font-weight: 600; }
+        
+        .qty-controls { display: flex; align-items: center; gap: 10px; }
+        .qty-btn { background: #F0F0F0; border: none; width: 30px; height: 30px; border-radius: 4px; font-weight: bold; cursor: pointer; color: #2C2C2C; }
+        .qty-input { width: 40px; text-align: center; border: 1px solid #EAEAEA; border-radius: 4px; padding: 5px; font-weight: 600; }
+        
+        .category-header { font-size: 0.85rem; font-weight: 700; color: #8C8C8C; text-transform: uppercase; margin: 20px 0 5px 0; background: #FCFAFA; padding: 8px; border-radius: 4px; }
+        
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #FFFFFF; padding: 15px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .total-price { font-size: 1.3rem; font-weight: 700; color: #2C2C2C; }
+        .order-btn { background-color: #25D366; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        
+        .note-input { width: 100%; padding: 12px; border: 1px solid #EAEAEA; border-radius: 6px; font-size: 0.9rem; margin-top: 10px; resize: vertical; outline: none;}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>TEZGAH</h1>
+        <p>SANDWICH SİPARİŞİ</p>
+    </div>
+
+    <div class="form-group">
+        <label for="customerName">Adınız Soyadınız *</label>
+        <input type="text" id="customerName" class="form-control" placeholder="Sipariş kime ait?" required>
+    </div>
+
+    <div class="section-title">1. Kendi Sandviçini Yarat</div>
+    
+    <div class="category-header">Ekmeğini Seç (Zorunlu)</div>
+    <label class="radio-label item-row">
+        <div><input type="radio" name="bread" value="Baston Ekmek" data-price="200" checked onchange="calculateTotal()"> Baston Ekmek</div>
+        <div class="price-tag">200 ₺</div>
+    </label>
+    <label class="radio-label item-row">
+        <div><input type="radio" name="bread" value="Ciabatta Ekmek" data-price="240" onchange="calculateTotal()"> Ciabatta Ekmek <span class="extra-badge">+40 ₺ Ekstra</span></div>
+        <div class="price-tag">240 ₺</div>
+    </label>
+
+    <div class="category-header">Sürmelik & Mezeler</div>
+    <div id="ingredientsListMezeler">
+        <label class="checkbox-label item-row"><input type="checkbox" value="Zeytin ezmesi" class="ingredient"> Zeytin ezmesi</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Acılı salça" class="ingredient"> Acılı salça</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Tatlı salça" class="ingredient"> Tatlı salça</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Acuka" class="ingredient"> Acuka</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Amerikan salatası" class="ingredient"> Amerikan salatası</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Haydari" class="ingredient"> Haydari</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Tereyağ" class="ingredient"> Tereyağ</label>
+    </div>
+
+    <div class="category-header">Peynir & Şarküteri</div>
+    <div id="ingredientsListSarkuteri">
+        <label class="checkbox-label item-row"><input type="checkbox" value="Kaşar" class="ingredient"> Kaşar</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Ezine peyniri" class="ingredient"> Ezine peyniri</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Krem peynir" class="ingredient"> Krem peynir</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Beyaz peynir" class="ingredient"> Beyaz peynir</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Dana salam" class="ingredient"> Dana salam</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Piliç salam" class="ingredient"> Piliç salam</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Tavuk jambon" class="ingredient"> Tavuk jambon</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Haşlanmış Yumurta" class="ingredient"> Haşlanmış Yumurta</label>
+        
+        <label class="checkbox-label item-row">
+            <div><input type="checkbox" value="Cheddar" class="ingredient extra" data-price="20" onchange="calculateTotal()"> Cheddar <span class="extra-badge">+20 ₺</span></div>
+        </label>
+        <label class="checkbox-label item-row">
+            <div><input type="checkbox" value="Dana Jambon" class="ingredient extra" data-price="20" onchange="calculateTotal()"> Dana Jambon <span class="extra-badge">+20 ₺</span></div>
+        </label>
+    </div>
+
+    <div class="category-header">Sıcak Lezzetler</div>
+    <div id="ingredientsListSicak">
+        <label class="checkbox-label item-row"><input type="checkbox" value="Kızartma Biber" class="ingredient"> Kızartma Biber</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Kızartma patlıcan" class="ingredient"> Kızartma patlıcan</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Kızartma patates" class="ingredient"> Kızartma patates</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Kızartma sosis" class="ingredient"> Kızartma sosis</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Köz patlıcan" class="ingredient"> Köz patlıcan</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Köz kırmızı biber" class="ingredient"> Köz kırmızı biber</label>
+    </div>
+
+    <div class="category-header">Taze Yeşillikler</div>
+    <div id="ingredientsListYesillik">
+        <label class="checkbox-label item-row"><input type="checkbox" value="Domates" class="ingredient"> Domates</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Biber" class="ingredient"> Biber</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Salatalık" class="ingredient"> Salatalık</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Roka" class="ingredient"> Roka</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Maydanoz" class="ingredient"> Maydanoz</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Mısır" class="ingredient"> Mısır</label>
+        <label class="checkbox-label item-row"><input type="checkbox" value="Marul" class="ingredient"> Marul</label>
+    </div>
+
+    <div class="section-title">2. Klasik & Tatlı Sandviçler</div>
+    <div id="otherItems">
+        <div class="item-row">
+            <div>Goralı <br><small class="price-tag">110 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('gorali', -1)">-</button>
+                <input type="text" id="gorali" class="qty-input product-qty" value="0" data-name="Goralı" data-price="110" readonly>
+                <button class="qty-btn" onclick="changeQty('gorali', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Sosisli <br><small class="price-tag">95 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('sosisli', -1)">-</button>
+                <input type="text" id="sosisli" class="qty-input product-qty" value="0" data-name="Sosisli" data-price="95" readonly>
+                <button class="qty-btn" onclick="changeQty('sosisli', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Tatlı Sandviç (3 Çeşit) <br><small class="price-tag">140 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('tatli3', -1)">-</button>
+                <input type="text" id="tatli3" class="qty-input product-qty" value="0" data-name="Tatlı Sandviç (3 Çeşit)" data-price="140" readonly>
+                <button class="qty-btn" onclick="changeQty('tatli3', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Tatlı Sandviç (4 Çeşit) <br><small class="price-tag">160 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('tatli4', -1)">-</button>
+                <input type="text" id="tatli4" class="qty-input product-qty" value="0" data-name="Tatlı Sandviç (4 Çeşit)" data-price="160" readonly>
+                <button class="qty-btn" onclick="changeQty('tatli4', 1)">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">3. İçecekler</div>
+    <div id="drinksList">
+        <div class="item-row">
+            <div>Kutu Kola <br><small class="price-tag">100 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('kutu_kola', -1)">-</button>
+                <input type="text" id="kutu_kola" class="qty-input product-qty" value="0" data-name="Kutu Kola" data-price="100" readonly>
+                <button class="qty-btn" onclick="changeQty('kutu_kola', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Şişe Kola <br><small class="price-tag">60 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('sise_kola', -1)">-</button>
+                <input type="text" id="sise_kola" class="qty-input product-qty" value="0" data-name="Şişe Kola" data-price="60" readonly>
+                <button class="qty-btn" onclick="changeQty('sise_kola', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Fanta <br><small class="price-tag">100 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('fanta', -1)">-</button>
+                <input type="text" id="fanta" class="qty-input product-qty" value="0" data-name="Fanta" data-price="100" readonly>
+                <button class="qty-btn" onclick="changeQty('fanta', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Fuse Tea <br><small class="price-tag">100 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('fuse_tea', -1)">-</button>
+                <input type="text" id="fuse_tea" class="qty-input product-qty" value="0" data-name="Fuse Tea" data-price="100" readonly>
+                <button class="qty-btn" onclick="changeQty('fuse_tea', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Cappy Pulpy <br><small class="price-tag">80 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('cappy', -1)">-</button>
+                <input type="text" id="cappy" class="qty-input product-qty" value="0" data-name="Cappy Pulpy" data-price="80" readonly>
+                <button class="qty-btn" onclick="changeQty('cappy', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Limonata <br><small class="price-tag">80 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('limonata', -1)">-</button>
+                <input type="text" id="limonata" class="qty-input product-qty" value="0" data-name="Limonata" data-price="80" readonly>
+                <button class="qty-btn" onclick="changeQty('limonata', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Büyük Ayran <br><small class="price-tag">45 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('ayran_buyuk', -1)">-</button>
+                <input type="text" id="ayran_buyuk" class="qty-input product-qty" value="0" data-name="Büyük Ayran" data-price="45" readonly>
+                <button class="qty-btn" onclick="changeQty('ayran_buyuk', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Küçük Ayran <br><small class="price-tag">35 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('ayran_kucuk', -1)">-</button>
+                <input type="text" id="ayran_kucuk" class="qty-input product-qty" value="0" data-name="Küçük Ayran" data-price="35" readonly>
+                <button class="qty-btn" onclick="changeQty('ayran_kucuk', 1)">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>Küçük Meyve Suyu <br><small class="price-tag">45 ₺</small></div>
+            <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty('meyve_suyu', -1)">-</button>
+                <input type="text" id="meyve_suyu" class="qty-input product-qty" value="0" data-name="Küçük Meyve Suyu" data-price="45" readonly>
+                <button class="qty-btn" onclick="changeQty('meyve_suyu', 1)">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">Sipariş Notu</div>
+    <textarea id="orderNote" class="note-input" rows="3" placeholder="Tatlı sandviç içeriklerinizi (Nutella, Fındık ezmesi, Bal, Kaymak) veya eklemek istediğiniz özel bir notu buraya yazabilirsiniz..."></textarea>
+
+</div>
+
+<div class="bottom-bar">
+    <div>
+        <div style="font-size: 0.8rem; color: #8C8C8C;">Toplam Tutar</div>
+        <div class="total-price" id="totalPriceDisplay">200 ₺</div>
+    </div>
+    <button class="order-btn" onclick="sendWhatsApp()">
+        WhatsApp'tan Sipariş Ver
+    </button>
+</div>
+
+<script>
+    function changeQty(id, delta) {
+        let input = document.getElementById(id);
+        let currentVal = parseInt(input.value);
+        let newVal = currentVal + delta;
+        if(newVal < 0) newVal = 0;
+        input.value = newVal;
+        calculateTotal();
+    }
+
+    function calculateTotal() {
+        let total = 0;
+        
+        let bread = document.querySelector('input[name="bread"]:checked');
+        if(bread) total += parseInt(bread.getAttribute('data-price'));
+
+        let extras = document.querySelectorAll('.ingredient.extra:checked');
+        extras.forEach(extra => {
+            total += parseInt(extra.getAttribute('data-price'));
+        });
+
+        let products = document.querySelectorAll('.product-qty');
+        products.forEach(prod => {
+            let qty = parseInt(prod.value);
+            if(qty > 0) {
+                let price = parseInt(prod.getAttribute('data-price'));
+                total += (qty * price);
+            }
+        });
+
+        document.getElementById('totalPriceDisplay').innerText = total + " ₺";
+        return total;
+    }
+
+    function sendWhatsApp() {
+        let name = document.getElementById('customerName').value.trim();
+        if(name === "") {
+            alert("Lütfen sipariş verebilmek için adınızı giriniz.");
+            document.getElementById('customerName').focus();
+            return;
+        }
+
+        let message = `*YENİ SİPARİŞ*\n*Müşteri:* ${name}\n\n`;
+        
+        let bread = document.querySelector('input[name="bread"]:checked').value;
+        let selectedIngredients = [];
+        document.querySelectorAll('.ingredient:checked').forEach(cb => {
+            selectedIngredients.push(cb.value);
+        });
+        
+        message += `🥪 *Kendi Sandviçim:* ${bread}\n`;
+        if(selectedIngredients.length > 0) {
+            message += `*İçindekiler:* ${selectedIngredients.join(", ")}\n`;
+        } else {
+            message += `*İçindekiler:* Sade\n`;
+        }
+        message += `\n`;
+
+        let products = document.querySelectorAll('.product-qty');
+        let hasOtherItems = false;
+        products.forEach(prod => {
+            let qty = parseInt(prod.value);
+            if(qty > 0) {
+                hasOtherItems = true;
+                let pName = prod.getAttribute('data-name');
+                message += `- ${qty}x ${pName}\n`;
+            }
+        });
+        if(hasOtherItems) message += `\n`;
+
+        let note = document.getElementById('orderNote').value.trim();
+        if(note !== "") {
+            message += `📝 *Not:* ${note}\n\n`;
+        }
+
+        let total = calculateTotal();
+        message += `💰 *Toplam Tutar:* ${total} ₺`;
+
+        let phone = "905421253258";
+        let encodedMessage = encodeURIComponent(message);
+        let whatsappURL = `https://wa.me/${phone}?text=${encodedMessage}`;
+        
+        window.open(whatsappURL, '_blank');
+    }
+
+    calculateTotal();
+</script>
+
+</body>
+</html>
