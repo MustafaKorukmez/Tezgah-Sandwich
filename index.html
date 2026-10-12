@@ -208,6 +208,43 @@
         }
         .item-row:not(.active) .qty-input { color: var(--muted); }
 
+        /* Teslimat & ödeme seçenekleri */
+        .choice-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .choice-option { position: relative; }
+        .choice-option input { position: absolute; opacity: 0; pointer-events: none; }
+        .choice-option .box {
+            display: block; height: 100%;
+            padding: 14px 40px 14px 14px;
+            border: 1.5px solid var(--line);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600; font-size: 0.95rem;
+            position: relative;
+            transition: border-color .15s, background .15s;
+        }
+        .choice-option .box small { display: block; font-weight: 400; color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+        .choice-option .box::after {
+            content: ""; position: absolute; top: 14px; right: 14px;
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 1.5px solid var(--line); background: #fff; transition: all .15s;
+        }
+        .choice-option input:checked + .box { border-color: var(--accent); background: var(--accent-soft); }
+        .choice-option input:checked + .box::after { border: 5px solid var(--accent); }
+        .choice-option input:focus-visible + .box { outline: 2px solid var(--accent); outline-offset: 2px; }
+        .hidden { display: none !important; }
+        .sub-field { margin-top: 16px; }
+        .iban-box { margin-top: 16px; padding: 16px; background: var(--bg); border-radius: 12px; }
+        .iban-box .holder { font-size: 0.8rem; color: var(--muted); }
+        .iban-box .holder b { display: block; color: var(--ink); font-size: 0.95rem; margin-top: 2px; }
+        .iban-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+        .iban-num { cursor: pointer; font-weight: 600; font-size: 0.95rem; letter-spacing: 0.5px; word-break: break-all; }
+        .copy-btn {
+            flex: none; border: 1.5px solid var(--ink); background: #fff; border-radius: 8px;
+            padding: 8px 14px; font-size: 0.82rem; font-weight: 600; cursor: pointer;
+        }
+        .copy-btn.done { background: var(--ink); color: #fff; }
+        .iban-hint { font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
+
         .footer-note { text-align: center; color: var(--muted); font-size: 0.8rem; margin: 20px 0 0; }
 
         /* Alt bar */
@@ -263,6 +300,11 @@
         <label class="field-label" for="customerName">Adınız Soyadınız *</label>
         <input type="text" id="customerName" class="form-control" placeholder="Sipariş kime ait?" autocomplete="name" required>
         <div class="error-msg" id="nameError">Sipariş verebilmek için lütfen adınızı yazın.</div>
+        <div class="sub-field">
+            <label class="field-label" for="customerPhone">Telefon <span id="phoneReq" class="hidden">*</span></label>
+            <input type="tel" id="customerPhone" class="form-control" placeholder="05xx xxx xx xx" autocomplete="tel" inputmode="tel">
+            <div class="error-msg" id="phoneError">Adrese teslimat için telefon numaranızı yazın.</div>
+        </div>
     </section>
 
     <!-- 2. Kendi sandviçini yarat -->
@@ -480,6 +522,55 @@
         <textarea id="orderNote" class="note-input" rows="3" placeholder="Örn: Tatlı sandviç → Nutella, Fındık ezmesi, Bal, Kaymak"></textarea>
     </section>
 
+    <!-- 6. Teslimat -->
+    <section class="card">
+        <div class="card-head">
+            <div class="step">6</div>
+            <div><h2>Teslimat</h2></div>
+        </div>
+        <div class="choice-options">
+            <label class="choice-option">
+                <input type="radio" name="delivery" value="Gel Al" checked>
+                <span class="box">Gel Al<small>Dükkandan teslim</small></span>
+            </label>
+            <label class="choice-option">
+                <input type="radio" name="delivery" value="Adrese Teslim">
+                <span class="box">Adrese Teslim<small>Eve / işyerine</small></span>
+            </label>
+        </div>
+        <div class="sub-field hidden" id="addressField">
+            <label class="field-label" for="customerAddress">Açık Adres *</label>
+            <textarea id="customerAddress" class="note-input" rows="3" placeholder="Mahalle, sokak, bina no, daire no, tarif..."></textarea>
+            <div class="error-msg" id="addressError">Adrese teslimat için lütfen adresinizi yazın.</div>
+        </div>
+    </section>
+
+    <!-- 7. Ödeme -->
+    <section class="card">
+        <div class="card-head">
+            <div class="step">7</div>
+            <div><h2>Ödeme</h2></div>
+        </div>
+        <div class="choice-options">
+            <label class="choice-option">
+                <input type="radio" name="payment" value="Teslimatta Ödeme" checked>
+                <span class="box">Teslimatta<small>Nakit / kart</small></span>
+            </label>
+            <label class="choice-option">
+                <input type="radio" name="payment" value="IBAN / Havale">
+                <span class="box">IBAN / Havale<small>Önceden ödeme</small></span>
+            </label>
+        </div>
+        <div class="iban-box hidden" id="ibanBox">
+            <div class="holder">Hesap Sahibi<b>Automan Otomotiv İnşaat</b></div>
+            <div class="iban-row">
+                <div class="iban-num" id="ibanText" onclick="copyIban()" role="button" tabindex="0" title="Kopyalamak için dokunun">TR78 0020 5000 0988 6443 8000 01</div>
+                <button type="button" class="copy-btn" id="copyBtn" onclick="copyIban()">Kopyala</button>
+            </div>
+            <div class="iban-hint">Ödemeyi yaptıktan sonra dekontu WhatsApp'tan gönderin.</div>
+        </div>
+    </section>
+
     <p class="footer-note">Siparişin WhatsApp'ta hazır mesaj olarak açılır, göndermen yeterli.</p>
 </div>
 
@@ -539,8 +630,34 @@
             bread + " · " + (selected.length > 0 ? selected.join(", ") : "Sade");
     }
 
+    function updateOptions() {
+        let isDelivery = document.querySelector('input[name="delivery"]:checked').value === 'Adrese Teslim';
+        document.getElementById('addressField').classList.toggle('hidden', !isDelivery);
+        document.getElementById('phoneReq').classList.toggle('hidden', !isDelivery);
+        let isIban = document.querySelector('input[name="payment"]:checked').value === 'IBAN / Havale';
+        document.getElementById('ibanBox').classList.toggle('hidden', !isIban);
+    }
+
+    function copyIban() {
+        let iban = document.getElementById('ibanText').innerText.replace(/\s/g, '');
+        let btn = document.getElementById('copyBtn');
+        let done = () => {
+            btn.innerText = 'Kopyalandı ✓';
+            btn.classList.add('done');
+            setTimeout(() => { btn.innerText = 'Kopyala'; btn.classList.remove('done'); }, 2000);
+        };
+        if(navigator.clipboard) {
+            navigator.clipboard.writeText(iban).then(done, () => {});
+        } else {
+            let t = document.createElement('textarea');
+            t.value = iban; document.body.appendChild(t); t.select();
+            document.execCommand('copy'); t.remove(); done();
+        }
+    }
+
     // Ekmek / malzeme seçimi değiştikçe toplamı ve özeti güncelle
     document.addEventListener('change', e => {
+        if(e.target.name === 'delivery' || e.target.name === 'payment') updateOptions();
         if(e.target.name === 'bread' || e.target.classList.contains('ingredient')) {
             calculateTotal();
             updateSandwichSummary();
@@ -552,18 +669,40 @@
         document.getElementById('nameError').classList.remove('show');
     });
 
+    function showError(input, errorId) {
+        input.classList.add('invalid');
+        document.getElementById(errorId).classList.add('show');
+        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        input.focus({ preventScroll: true });
+    }
+
+    ['customerPhone', 'customerAddress'].forEach(id => {
+        document.getElementById(id).addEventListener('input', e => {
+            e.target.classList.remove('invalid');
+            document.getElementById(id === 'customerPhone' ? 'phoneError' : 'addressError').classList.remove('show');
+        });
+    });
+
     function sendWhatsApp() {
         let nameInput = document.getElementById('customerName');
         let name = nameInput.value.trim();
-        if(name === "") {
-            nameInput.classList.add('invalid');
-            document.getElementById('nameError').classList.add('show');
-            nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            nameInput.focus({ preventScroll: true });
-            return;
-        }
+        let phoneInput = document.getElementById('customerPhone');
+        let phoneNo = phoneInput.value.trim();
+        let addressInput = document.getElementById('customerAddress');
+        let address = addressInput.value.trim();
+        let delivery = document.querySelector('input[name="delivery"]:checked').value;
+        let payment = document.querySelector('input[name="payment"]:checked').value;
+        let isDelivery = delivery === 'Adrese Teslim';
 
-        let message = `*YENİ SİPARİŞ*\n*Müşteri:* ${name}\n\n`;
+        if(name === "") return showError(nameInput, 'nameError');
+        if(isDelivery && phoneNo === "") return showError(phoneInput, 'phoneError');
+        if(isDelivery && address === "") return showError(addressInput, 'addressError');
+
+        let message = `*YENİ SİPARİŞ*\n*Müşteri:* ${name}\n`;
+        if(phoneNo !== "") message += `*Telefon:* ${phoneNo}\n`;
+        message += `*Teslimat:* ${delivery}\n`;
+        if(isDelivery) message += `*Adres:* ${address}\n`;
+        message += `*Ödeme:* ${payment}\n\n`;
 
         let bread = document.querySelector('input[name="bread"]:checked').value;
         let selectedIngredients = [];
@@ -608,6 +747,7 @@
 
     calculateTotal();
     updateSandwichSummary();
+    updateOptions();
 </script>
 
 </body>
