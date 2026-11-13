@@ -320,16 +320,16 @@
         <div class="group-label">Ekmek</div>
         <div class="bread-options">
             <label class="bread-option">
-                <input type="radio" name="bread" value="Baston Ekmek" data-price="200" checked>
+                <input type="radio" name="bread" value="Baget Ekmek" data-price="200" checked>
                 <span class="box">
-                    <span class="name">Baston</span>
+                    <span class="name">Baget</span>
                     <span class="price">200 ₺</span>
                 </span>
             </label>
             <label class="bread-option">
-                <input type="radio" name="bread" value="Ciabatta Ekmek" data-price="240">
+                <input type="radio" name="bread" value="Ekşi Mayalı Ekmek" data-price="240">
                 <span class="box">
-                    <span class="name">Ciabatta</span>
+                    <span class="name">Ekşi Mayalı</span>
                     <span class="price">240 ₺<em>+40</em></span>
                 </span>
             </label>
@@ -383,7 +383,7 @@
 
         <div class="summary">
             <strong>Sandviçin</strong>
-            <span id="sandwichSummary">Baston Ekmek · Sade</span>
+            <span id="sandwichSummary">Baget Ekmek · Sade</span>
         </div>
     </section>
 
@@ -535,7 +535,7 @@
             </label>
             <label class="choice-option">
                 <input type="radio" name="delivery" value="Adrese Teslim">
-                <span class="box">Adrese Teslim<small>Eve / işyerine</small></span>
+                <span class="box">Adrese Teslim<small>Eve / işyerine · +50 ₺</small></span>
             </label>
         </div>
         <div class="sub-field hidden" id="addressField">
@@ -618,6 +618,8 @@
             }
         });
 
+        if(document.querySelector('input[name="delivery"]:checked').value === 'Adrese Teslim') total += 50;
+
         document.getElementById('totalPriceDisplay').innerText = total + " ₺";
         return total;
     }
@@ -657,7 +659,7 @@
 
     // Ekmek / malzeme seçimi değiştikçe toplamı ve özeti güncelle
     document.addEventListener('change', e => {
-        if(e.target.name === 'delivery' || e.target.name === 'payment') updateOptions();
+        if(e.target.name === 'delivery' || e.target.name === 'payment') { updateOptions(); calculateTotal(); }
         if(e.target.name === 'bread' || e.target.classList.contains('ingredient')) {
             calculateTotal();
             updateSandwichSummary();
@@ -700,7 +702,7 @@
 
         let message = `*YENİ SİPARİŞ*\n*Müşteri:* ${name}\n`;
         if(phoneNo !== "") message += `*Telefon:* ${phoneNo}\n`;
-        message += `*Teslimat:* ${delivery}\n`;
+        message += `*Teslimat:* ${delivery}${isDelivery ? ' (+50 ₺)' : ''}\n`;
         if(isDelivery) message += `*Adres:* ${address}\n`;
         message += `*Ödeme:* ${payment}\n\n`;
 
