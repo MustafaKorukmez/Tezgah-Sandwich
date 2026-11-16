@@ -222,6 +222,20 @@
         .item-name { font-size: 0.95rem; font-weight: 500; }
         .item-price { display: block; font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
         .item-row.active .item-name { color: var(--accent); font-weight: 600; }
+        .item-row:has(+ .item-options:not(.hidden)),
+        .item-row:has(+ .item-options.hidden:last-child) { border-bottom: none; }
+        .item-options {
+            padding: 4px 0 14px;
+            border-bottom: 1px solid var(--line);
+        }
+        .item-options:last-child { border-bottom: none; padding-bottom: 0; }
+        .sweet { padding-top: 14px; }
+        .sweet-chips { margin-top: 10px; }
+        .sweet.sausage { padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+        .sausage-types { margin-top: 10px; }
+        .opt-label { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+        .opt-count { font-weight: 600; color: var(--accent); }
+        .item-options .chip span { padding: 6px 12px; font-size: 0.85rem; }
 
         .qty-controls { display: flex; align-items: center; gap: 4px; }
         .qty-btn {
@@ -251,6 +265,7 @@
         /* Teslimat & ödeme seçenekleri */
         .choice-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .choice-option { position: relative; }
+        .choice-option.wide { grid-column: 1 / -1; }
         .choice-option input { position: absolute; opacity: 0; pointer-events: none; }
         .choice-option .box {
             display: block; height: 100%;
@@ -455,28 +470,47 @@
                 <button type="button" class="qty-btn plus" onclick="changeQty('gorali', 1)" aria-label="Arttır">+</button>
             </div>
         </div>
-        <div class="item-row">
-            <div><span class="item-name">Sosisli</span><span class="item-price">95 ₺</span></div>
-            <div class="qty-controls">
-                <button type="button" class="qty-btn" onclick="changeQty('sosisli', -1)" aria-label="Azalt">−</button>
-                <input type="text" id="sosisli" class="qty-input product-qty" value="0" data-name="Sosisli" data-price="95" readonly>
-                <button type="button" class="qty-btn plus" onclick="changeQty('sosisli', 1)" aria-label="Arttır">+</button>
+        <div class="sweet sausage">
+            <div class="item-name">Sosisli</div>
+            <span class="item-price">Çeşidini ve soslarını seç, istediğin kadar ekle</span>
+            <div class="bread-options sausage-types">
+                <label class="bread-option">
+                    <input type="radio" name="sausage" value="Sosisli" data-price="95" checked>
+                    <span class="box"><span class="name">Sosisli</span><span class="price">95 ₺</span></span>
+                </label>
+                <label class="bread-option">
+                    <input type="radio" name="sausage" value="Duble Sosisli" data-price="135">
+                    <span class="box"><span class="name">Duble Sosisli</span><span class="price">135 ₺</span></span>
+                </label>
+            </div>
+            <div class="chips sweet-chips">
+                <label class="chip"><input type="checkbox" value="Ketçap" class="sausage-opt"><span>Ketçap</span></label>
+                <label class="chip"><input type="checkbox" value="Mayonez" class="sausage-opt"><span>Mayonez</span></label>
+                <label class="chip"><input type="checkbox" value="Hardal" class="sausage-opt"><span>Hardal</span></label>
+                <label class="chip"><input type="checkbox" value="Barbekü sos" class="sausage-opt"><span>Barbekü sos</span></label>
+                <label class="chip"><input type="checkbox" value="Turşu" class="sausage-opt"><span>Turşu</span></label>
+            </div>
+            <button type="button" class="add-btn" id="addSausageBtn" onclick="addSausage()">+ Sosisli Ekle</button>
+            <div class="error-msg" id="sausageError">Seçtiğin sosisliyi henüz eklemedin. "Sosisli Ekle"ye bas ya da seçimleri kaldır.</div>
+            <div id="sausageBox" class="cart hidden">
+                <div class="group-label">Sosislilerin <span id="sausageCount"></span></div>
+                <div id="sausageList"></div>
             </div>
         </div>
-        <div class="item-row">
-            <div><span class="item-name">Tatlı Sandviç (3 Çeşit)</span><span class="item-price">140 ₺</span></div>
-            <div class="qty-controls">
-                <button type="button" class="qty-btn" onclick="changeQty('tatli3', -1)" aria-label="Azalt">−</button>
-                <input type="text" id="tatli3" class="qty-input product-qty" value="0" data-name="Tatlı Sandviç (3 Çeşit)" data-price="140" readonly>
-                <button type="button" class="qty-btn plus" onclick="changeQty('tatli3', 1)" aria-label="Arttır">+</button>
+        <div class="sweet">
+            <div class="item-name">Tatlı Sandviç</div>
+            <span class="item-price">150 ₺ · içeriğini seç, istediğin kadar ekle</span>
+            <div class="chips sweet-chips">
+                <label class="chip"><input type="checkbox" value="Nutella" class="sweet-opt"><span>Nutella</span></label>
+                <label class="chip"><input type="checkbox" value="Parçacıklı fındık ezmesi" class="sweet-opt"><span>Parçacıklı fındık ezmesi</span></label>
+                <label class="chip"><input type="checkbox" value="Kaymak" class="sweet-opt"><span>Kaymak</span></label>
+                <label class="chip"><input type="checkbox" value="Bal" class="sweet-opt"><span>Bal</span></label>
             </div>
-        </div>
-        <div class="item-row">
-            <div><span class="item-name">Tatlı Sandviç (4 Çeşit)</span><span class="item-price">160 ₺</span></div>
-            <div class="qty-controls">
-                <button type="button" class="qty-btn" onclick="changeQty('tatli4', -1)" aria-label="Azalt">−</button>
-                <input type="text" id="tatli4" class="qty-input product-qty" value="0" data-name="Tatlı Sandviç (4 Çeşit)" data-price="160" readonly>
-                <button type="button" class="qty-btn plus" onclick="changeQty('tatli4', 1)" aria-label="Arttır">+</button>
+            <button type="button" class="add-btn" id="addSweetBtn" onclick="addSweet()">+ Tatlı Sandviç Ekle</button>
+            <div class="error-msg" id="sweetError">Tatlı sandviç için en az bir içerik seç.</div>
+            <div id="sweetBox" class="cart hidden">
+                <div class="group-label">Tatlı sandviçlerin <span id="sweetCount"></span></div>
+                <div id="sweetList"></div>
             </div>
         </div>
     </section>
@@ -567,10 +601,10 @@
             <div class="step">5</div>
             <div>
                 <h2>Sipariş Notu</h2>
-                <p>Tatlı sandviç içerikleri veya özel isteklerin için.</p>
+                <p>Özel isteklerin varsa yaz.</p>
             </div>
         </div>
-        <textarea id="orderNote" class="note-input" rows="3" placeholder="Örn: Tatlı sandviç → Nutella, Fındık ezmesi, Bal, Kaymak"></textarea>
+        <textarea id="orderNote" class="note-input" rows="3" placeholder="Örn: Domatessiz olsun, az acılı..."></textarea>
     </section>
 
     <!-- 6. Teslimat -->
@@ -604,10 +638,14 @@
         </div>
         <div class="choice-options">
             <label class="choice-option">
-                <input type="radio" name="payment" value="Teslimatta Ödeme" checked>
-                <span class="box">Teslimatta<small>Nakit / kart</small></span>
+                <input type="radio" name="payment" value="Nakit" checked>
+                <span class="box">Nakit<small>Teslimatta</small></span>
             </label>
             <label class="choice-option">
+                <input type="radio" name="payment" value="Kart">
+                <span class="box">Kart<small>Teslimatta</small></span>
+            </label>
+            <label class="choice-option wide">
                 <input type="radio" name="payment" value="IBAN / Havale">
                 <span class="box">IBAN / Havale<small>Önceden ödeme</small></span>
             </label>
@@ -646,8 +684,29 @@
         if(newVal < 0) newVal = 0;
         input.value = newVal;
         input.closest('.item-row').classList.toggle('active', newVal > 0);
+        let opts = document.querySelector(`.item-options[data-for="${id}"]`);
+        if(opts) opts.classList.toggle('hidden', newVal === 0);
         calculateTotal();
     }
+
+    // Sosisli sosları / tatlı sandviç çeşitleri
+    function selectedOpts(id) {
+        let box = document.querySelector(`.item-options[data-for="${id}"]`);
+        return box ? Array.from(box.querySelectorAll('.opt:checked')).map(cb => cb.value) : [];
+    }
+
+    document.querySelectorAll('.item-options').forEach(box => {
+        let limit = parseInt(box.dataset.limit) || 0;
+        box.addEventListener('change', e => {
+            let checked = box.querySelectorAll('.opt:checked');
+            if(limit && checked.length > limit) e.target.checked = false;
+            let n = box.querySelectorAll('.opt:checked').length;
+            let count = box.querySelector('.opt-count');
+            if(count) count.textContent = `(${n}/${limit})`;
+            let err = box.querySelector('.error-msg');
+            if(err && n === limit) err.classList.remove('show');
+        });
+    });
 
     // Eklenen kendi sandviçleri: { bread, ingredients[], unitPrice, qty }
     let cart = [];
@@ -689,24 +748,82 @@
         calculateTotal();
     }
 
-    function changeCartQty(i, delta) {
-        cart[i].qty += delta;
-        if(cart[i].qty < 1) cart.splice(i, 1);
+    // Tatlı sandviçler: { bread, ingredients[], unitPrice, qty }
+    const SWEET_PRICE = 150;
+    let sweetCart = [];
+
+    function selectedSweet() {
+        return Array.from(document.querySelectorAll('.sweet-opt:checked')).map(cb => cb.value);
+    }
+
+    function addSweet() {
+        let items = selectedSweet();
+        let err = document.getElementById('sweetError');
+        err.textContent = 'Tatlı sandviç için en az bir içerik seç.';
+        if(items.length === 0) { err.classList.add('show'); return; }
+        err.classList.remove('show');
+
+        let key = items.join(",");
+        let same = sweetCart.find(c => c.ingredients.join(",") === key);
+        if(same) same.qty++;
+        else sweetCart.push({ bread: 'Tatlı Sandviç', ingredients: items, unitPrice: SWEET_PRICE, qty: 1 });
+
+        document.querySelectorAll('.sweet-opt:checked').forEach(cb => cb.checked = false);
+        let btn = document.getElementById('addSweetBtn');
+        btn.innerText = 'Eklendi ✓';
+        btn.classList.add('done');
+        setTimeout(() => { btn.innerText = '+ Tatlı Sandviç Ekle'; btn.classList.remove('done'); }, 1400);
+
         renderCart();
         calculateTotal();
     }
 
-    function removeFromCart(i) {
-        cart.splice(i, 1);
+    document.querySelectorAll('.sausage-opt, input[name="sausage"]').forEach(cb =>
+        cb.addEventListener('change', () => document.getElementById('sausageError').classList.remove('show')));
+
+    document.querySelectorAll('.sweet-opt').forEach(cb =>
+        cb.addEventListener('change', () => document.getElementById('sweetError').classList.remove('show')));
+
+    // Sosisliler: { bread (çeşit), ingredients[] (soslar), unitPrice, qty }
+    let sausageCart = [];
+
+    function currentSausage() {
+        let type = document.querySelector('input[name="sausage"]:checked');
+        let sauces = Array.from(document.querySelectorAll('.sausage-opt:checked')).map(cb => cb.value);
+        return { bread: type.value, ingredients: sauces, unitPrice: parseInt(type.dataset.price), dirty: sauces.length > 0 || type !== document.querySelector('input[name="sausage"]') };
+    }
+
+    function addSausage() {
+        let s = currentSausage();
+        delete s.dirty;
+        let key = s.bread + "|" + s.ingredients.join(",");
+        let same = sausageCart.find(c => c.bread + "|" + c.ingredients.join(",") === key);
+        if(same) same.qty++;
+        else sausageCart.push(Object.assign(s, { qty: 1 }));
+
+        document.querySelectorAll('.sausage-opt:checked').forEach(cb => cb.checked = false);
+        document.querySelector('input[name="sausage"]').checked = true;
+        document.getElementById('sausageError').classList.remove('show');
+        let btn = document.getElementById('addSausageBtn');
+        btn.innerText = 'Eklendi ✓';
+        btn.classList.add('done');
+        setTimeout(() => { btn.innerText = '+ Sosisli Ekle'; btn.classList.remove('done'); }, 1400);
+
         renderCart();
         calculateTotal();
     }
 
     function renderCart() {
-        let list = document.getElementById('cartList');
+        renderList(cart, 'cartList', 'cartBox', 'cartCount');
+        renderList(sausageCart, 'sausageList', 'sausageBox', 'sausageCount');
+        renderList(sweetCart, 'sweetList', 'sweetBox', 'sweetCount');
+    }
+
+    function renderList(items, listId, boxId, countId) {
+        let list = document.getElementById(listId);
         list.innerHTML = '';
         let count = 0;
-        cart.forEach((s, i) => {
+        items.forEach((s, i) => {
             count += s.qty;
             let row = document.createElement('div');
             row.className = 'cart-item';
@@ -724,19 +841,20 @@
                 : `${s.unitPrice} ₺`;
             row.querySelector('.qty-input').value = s.qty;
             let btns = row.querySelectorAll('.qty-btn');
-            btns[0].onclick = () => changeCartQty(i, -1);
-            btns[1].onclick = () => changeCartQty(i, 1);
-            row.querySelector('.remove-btn').onclick = () => removeFromCart(i);
+            let update = () => { renderCart(); calculateTotal(); };
+            btns[0].onclick = () => { s.qty--; if(s.qty < 1) items.splice(i, 1); update(); };
+            btns[1].onclick = () => { s.qty++; update(); };
+            row.querySelector('.remove-btn').onclick = () => { items.splice(i, 1); update(); };
             list.appendChild(row);
         });
-        document.getElementById('cartCount').textContent = count > 0 ? `(${count})` : '';
-        document.getElementById('cartBox').classList.toggle('hidden', cart.length === 0);
+        document.getElementById(countId).textContent = count > 0 ? `(${count})` : '';
+        document.getElementById(boxId).classList.toggle('hidden', items.length === 0);
     }
 
     function calculateTotal() {
         let total = 0;
 
-        cart.forEach(s => total += s.unitPrice * s.qty);
+        cart.concat(sausageCart, sweetCart).forEach(s => total += s.unitPrice * s.qty);
 
         let products = document.querySelectorAll('.product-qty');
         products.forEach(prod => {
@@ -835,8 +953,24 @@
             return;
         }
 
+        // Seçilmiş ama eklenmemiş sosisli varsa uyar
+        if(currentSausage().dirty) {
+            document.getElementById('sausageError').classList.add('show');
+            document.getElementById('addSausageBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        // İçerik seçilmiş ama eklenmemiş tatlı sandviç varsa uyar
+        if(selectedSweet().length > 0) {
+            let err = document.getElementById('sweetError');
+            err.textContent = 'Seçtiğin tatlı sandviçi henüz eklemedin. "Tatlı Sandviç Ekle"ye bas ya da seçimleri kaldır.';
+            err.classList.add('show');
+            document.getElementById('addSweetBtn').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
         let hasProducts = Array.from(document.querySelectorAll('.product-qty')).some(p => parseInt(p.value) > 0);
-        if(cart.length === 0 && !hasProducts) {
+        if(cart.length === 0 && sausageCart.length === 0 && sweetCart.length === 0 && !hasProducts) {
             alert("Sepetin boş. Lütfen en az bir sandviç veya ürün ekle.");
             return;
         }
@@ -845,12 +979,29 @@
         if(phoneNo !== "") message += `*Telefon:* ${phoneNo}\n`;
         message += `*Teslimat:* ${delivery}${isDelivery ? ' (+50 ₺)' : ''}\n`;
         if(isDelivery) message += `*Adres:* ${address}\n`;
-        message += `*Ödeme:* ${payment}\n\n`;
+        let paymentText = payment === 'IBAN / Havale' ? payment : `${payment} (teslimatta)`;
+        message += `*Ödeme:* ${paymentText}\n\n`;
 
         if(cart.length > 0) {
             message += `🥪 *Kendi Sandviçlerim:*\n`;
             cart.forEach((s, i) => {
                 message += `${i + 1}) ${s.qty}x ${s.bread} — ${sandwichDesc(s)} (${s.unitPrice * s.qty} ₺)\n`;
+            });
+            message += `\n`;
+        }
+
+        if(sausageCart.length > 0) {
+            message += `🌭 *Sosisliler:*\n`;
+            sausageCart.forEach((s, i) => {
+                message += `${i + 1}) ${s.qty}x ${s.bread} — ${sandwichDesc(s)} (${s.unitPrice * s.qty} ₺)\n`;
+            });
+            message += `\n`;
+        }
+
+        if(sweetCart.length > 0) {
+            message += `🍯 *Tatlı Sandviçler:*\n`;
+            sweetCart.forEach((s, i) => {
+                message += `${i + 1}) ${s.qty}x ${s.ingredients.join(", ")} (${s.unitPrice * s.qty} ₺)\n`;
             });
             message += `\n`;
         }
@@ -862,7 +1013,10 @@
             if(qty > 0) {
                 hasOtherItems = true;
                 let pName = prod.getAttribute('data-name');
-                message += `- ${qty}x ${pName}\n`;
+                let opts = selectedOpts(prod.id);
+                let isOptBox = document.querySelector(`.item-options[data-for="${prod.id}"]`);
+                let extra = opts.length > 0 ? ` (${opts.join(", ")})` : (isOptBox ? ' (Sade)' : '');
+                message += `- ${qty}x ${pName}${extra}\n`;
             }
         });
         if(hasOtherItems) message += `\n`;
