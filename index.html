@@ -209,6 +209,7 @@
             font-size: 0.8rem; color: var(--muted); text-decoration: underline; cursor: pointer;
         }
         .remove-btn:hover { color: var(--error); }
+        .saved-note { font-size: 0.8rem; color: var(--muted); margin-top: 14px; }
         .cart-hint { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
 
         /* Ürün satırları */
@@ -422,6 +423,7 @@
             <input type="tel" id="customerPhone" class="form-control" placeholder="05xx xxx xx xx" autocomplete="tel" inputmode="tel">
             <div class="error-msg" id="phoneError">Adrese teslimat için telefon numaranızı yazın.</div>
         </div>
+        <p class="saved-note hidden" id="savedNote">Bilgilerin bu cihazda kayıtlı. <button type="button" class="remove-btn" onclick="clearSavedInfo()">Bilgilerimi sil</button></p>
     </section>
 
     <!-- 2. Kendi sandviçini yarat -->
@@ -1209,8 +1211,47 @@
         let encodedMessage = encodeURIComponent(message);
         let whatsappURL = `https://wa.me/${phone}?text=${encodedMessage}`;
 
+        saveInfo({ name: name, phone: phoneNo, address: address, delivery: delivery, payment: payment });
+
         window.open(whatsappURL, '_blank');
     }
+
+    // ---- Müşteri bilgilerini bu cihazda hatırla ----
+    const INFO_KEY = 'tezgahCustomerInfo';
+
+    function saveInfo(info) {
+        try {
+            // Gel Al siparişinde adres boşsa önceki kayıtlı adresi koru
+            let old = JSON.parse(localStorage.getItem(INFO_KEY) || '{}');
+            if(!info.address && old.address) info.address = old.address;
+            if(!info.phone && old.phone) info.phone = old.phone;
+            localStorage.setItem(INFO_KEY, JSON.stringify(info));
+            document.getElementById('savedNote').classList.remove('hidden');
+        } catch(e) {}
+    }
+
+    function loadInfo() {
+        try {
+            let info = JSON.parse(localStorage.getItem(INFO_KEY) || 'null');
+            if(!info) return;
+            document.getElementById('customerName').value = info.name || '';
+            document.getElementById('customerPhone').value = info.phone || '';
+            document.getElementById('customerAddress').value = info.address || '';
+            ['delivery', 'payment'].forEach(group => {
+                let radio = Array.from(document.querySelectorAll(`input[name="${group}"]`)).find(r => r.value === info[group]);
+                if(radio) radio.checked = true;
+            });
+            document.getElementById('savedNote').classList.remove('hidden');
+        } catch(e) {}
+    }
+
+    function clearSavedInfo() {
+        try { localStorage.removeItem(INFO_KEY); } catch(e) {}
+        ['customerName', 'customerPhone', 'customerAddress'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('savedNote').classList.add('hidden');
+    }
+
+    loadInfo();
 
     calculateTotal();
     updateSandwichSummary();
