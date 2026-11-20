@@ -108,6 +108,7 @@
 
         /* Ekmek seçimi */
         .bread-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .bread-options > .bread-option:last-child:nth-child(odd) { grid-column: 1 / -1; }
         .bread-option input { position: absolute; opacity: 0; pointer-events: none; }
         .bread-option .box {
             display: block;
@@ -449,6 +450,13 @@
                 <input type="radio" name="bread" value="Ekşi Mayalı Ekmek" data-price="240">
                 <span class="box">
                     <span class="name">Ekşi Mayalı</span>
+                    <span class="price">240 ₺<em>+40</em></span>
+                </span>
+            </label>
+            <label class="bread-option">
+                <input type="radio" name="bread" value="Tam Buğday Ekmek" data-price="240">
+                <span class="box">
+                    <span class="name">Tam Buğday</span>
                     <span class="price">240 ₺<em>+40</em></span>
                 </span>
             </label>
