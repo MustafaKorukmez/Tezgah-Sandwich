@@ -222,6 +222,8 @@
         .item-row:last-child { border-bottom: none; padding-bottom: 0; }
         .item-row:first-child { padding-top: 0; }
         .item-name { font-size: 0.95rem; font-weight: 500; }
+        .item-desc { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+        .item-row .qty-controls { flex: none; margin-left: 12px; }
         .item-price { display: block; font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
         .item-row.active .item-name { color: var(--accent); font-weight: 600; }
         .item-row:has(+ .item-options:not(.hidden)),
@@ -540,6 +542,18 @@
                 <button type="button" class="qty-btn" onclick="changeQty('gorali', -1)" aria-label="Azalt">−</button>
                 <input type="text" id="gorali" class="qty-input product-qty" value="0" data-name="Goralı" data-price="110" readonly>
                 <button type="button" class="qty-btn plus" onclick="changeQty('gorali', 1)" aria-label="Arttır">+</button>
+            </div>
+        </div>
+        <div class="item-row">
+            <div>
+                <span class="item-name">Ton Balıklı Sandviç</span>
+                <span class="item-desc">Ekşi mayalı ekmek, ton balığı (160 gr), labne, roka, mayonez, domates</span>
+                <span class="item-price">300 ₺</span>
+            </div>
+            <div class="qty-controls">
+                <button type="button" class="qty-btn" onclick="changeQty('ton_balikli', -1)" aria-label="Azalt">−</button>
+                <input type="text" id="ton_balikli" class="qty-input product-qty" value="0" data-name="Ton Balıklı Sandviç" data-price="300" readonly>
+                <button type="button" class="qty-btn plus" onclick="changeQty('ton_balikli', 1)" aria-label="Arttır">+</button>
             </div>
         </div>
         <div class="sweet sausage">
