@@ -556,6 +556,18 @@
                 <button type="button" class="qty-btn plus" onclick="changeQty('ton_balikli', 1)" aria-label="Arttır">+</button>
             </div>
         </div>
+        <div class="item-row">
+            <div>
+                <span class="item-name">Klasik Sandviç</span>
+                <span class="item-desc">Ekşi mayalı ekmek, labne, kaşar peyniri, dana salam, hindi salam, hindi jambon, domates, salatalık</span>
+                <span class="item-price">225 ₺</span>
+            </div>
+            <div class="qty-controls">
+                <button type="button" class="qty-btn" onclick="changeQty('klasik', -1)" aria-label="Azalt">−</button>
+                <input type="text" id="klasik" class="qty-input product-qty" value="0" data-name="Klasik Sandviç" data-price="225" readonly>
+                <button type="button" class="qty-btn plus" onclick="changeQty('klasik', 1)" aria-label="Arttır">+</button>
+            </div>
+        </div>
         <div class="sweet sausage">
             <div class="item-name">Sosisli</div>
             <span class="item-price">Çeşidini ve soslarını seç, istediğin kadar ekle</span>
@@ -707,6 +719,10 @@
             <label class="choice-option">
                 <input type="radio" name="delivery" value="Adrese Teslim">
                 <span class="box">Adrese Teslim<small>Eve / işyerine · +50 ₺</small></span>
+            </label>
+            <label class="choice-option wide">
+                <input type="radio" name="delivery" value="Masaya Servis">
+                <span class="box">Masaya Servis<small>Dükkanda masana getirelim</small></span>
             </label>
         </div>
         <div class="sub-field hidden" id="addressField">
@@ -1078,8 +1094,7 @@
     function updateOptions() {
         let isDelivery = document.querySelector('input[name="delivery"]:checked').value === 'Adrese Teslim';
         document.getElementById('addressField').classList.toggle('hidden', !isDelivery);
-        document.getElementById('phoneReq').classList.toggle('hidden', !isDelivery);
-        let isIban = document.querySelector('input[name="payment"]:checked').value === 'IBAN / Havale';
+        document.getElementById('phoneReq').classList.toggle('hidden', !isDelivery);        let isIban = document.querySelector('input[name="payment"]:checked').value === 'IBAN / Havale';
         document.getElementById('ibanBox').classList.toggle('hidden', !isIban);
     }
 
@@ -1144,7 +1159,6 @@
         if(name === "") return showError(nameInput, 'nameError');
         if(isDelivery && phoneNo === "") return showError(phoneInput, 'phoneError');
         if(isDelivery && address === "") return showError(addressInput, 'addressError');
-
         // Malzeme seçilmiş ama sepete eklenmemiş sandviç varsa uyar
         if(currentSandwich().ingredients.length > 0) {
             let err = document.getElementById('builderError');
@@ -1178,8 +1192,7 @@
         let message = `*YENİ SİPARİŞ*\n*Müşteri:* ${name}\n`;
         if(phoneNo !== "") message += `*Telefon:* ${phoneNo}\n`;
         message += `*Teslimat:* ${delivery}${isDelivery ? ' (+50 ₺)' : ''}\n`;
-        if(isDelivery) message += `*Adres:* ${address}\n`;
-        let paymentText = payment === 'IBAN / Havale' ? payment : `${payment} (teslimatta)`;
+        if(isDelivery) message += `*Adres:* ${address}\n`;        let paymentText = payment === 'IBAN / Havale' ? payment : `${payment} (teslimatta)`;
         message += `*Ödeme:* ${paymentText}\n\n`;
 
         if(cart.length > 0) {
@@ -1247,6 +1260,8 @@
             let old = JSON.parse(localStorage.getItem(INFO_KEY) || '{}');
             if(!info.address && old.address) info.address = old.address;
             if(!info.phone && old.phone) info.phone = old.phone;
+            // Masaya servis o anki ziyarete özel; bir sonraki girişte önceki tercihi göster
+            if(info.delivery === 'Masaya Servis') info.delivery = old.delivery || 'Gel Al';
             localStorage.setItem(INFO_KEY, JSON.stringify(info));
             document.getElementById('savedNote').classList.remove('hidden');
         } catch(e) {}
